@@ -5,7 +5,9 @@ import plotly.io as pio  # Import Plotly I/O for rendering graphs as HTML
 app = Flask(__name__)  # Create a Flask application instance
 
 @app.route('/', methods=['GET', 'POST'])  # Define the route for the homepage with GET and POST methods
-def index():
+
+
+def index() -> str:
     result = ""  # Initialize result message
     profit_loss_plot = None  # Initialize variable for the profit/loss plot
 
@@ -15,7 +17,7 @@ def index():
 
         if income and expenses:  # Check if both income and expenses are provided
             try:
-                # Convert income and expenses to float after removing commas
+                # Convert to float after removing commas
                 income = float(income.replace(',', ''))
                 expenses = float(expenses.replace(',', ''))
                 profit_loss = income - expenses  # Calculate profit/loss
@@ -28,7 +30,7 @@ def index():
                 else:
                     result = "Break-even: No profit, no loss."
 
-                # Create the profit/loss plot using the provided income and expenses
+                # Create the profit/loss plot
                 profit_loss_plot = create_profit_loss_plot(income, expenses)
 
             except ValueError:  # Handle cases where input cannot be converted to float
@@ -39,8 +41,17 @@ def index():
     # Render the index.html template, passing in the result message and the plot HTML
     return render_template('index.html', result=result, profit_loss_plot=profit_loss_plot)
 
-def create_profit_loss_plot(income, expenses):
-    # Create a bar chart to visualize income and expenses
+
+def create_profit_loss_plot(income, expenses) -> str:
+    """Create a bar chart visualizing income and expenses.
+
+    Args:
+        income (float): The income value.
+        expenses (float): The expenses value.
+
+    Returns:
+        str: HTML representation of the plot.
+    """
     fig = go.Figure(data=[
         go.Bar(name='Income', x=['Income'], y=[income], marker_color='green'),  # Bar for income
         go.Bar(name='Expenses', x=['Expenses'], y=[expenses], marker_color='red')  # Bar for expenses
@@ -57,16 +68,29 @@ def create_profit_loss_plot(income, expenses):
     plot_div = pio.to_html(fig, full_html=False)
     return plot_div  # Return the HTML representation of the plot
 
-def format_number(value):
-    # Format numbers into readable strings (e.g., K for thousands, M for millions)
-    if abs(value) < 1_000:  # Less than 1,000
+
+K_THRESHOLD = 1_000
+M_THRESHOLD = 1_000_000
+B_THRESHOLD = 1_000_000_000
+
+def format_number(value: float) -> str:
+    """Format a number into a readable string with suffixes (K, M, B).
+
+    Args:
+        value (float): The number to format.
+
+    Returns:
+        str: Formatted number as a string.
+    """
+    if abs(value) < K_THRESHOLD:  # Less than 1,000
         return f"{value:.1f}"
-    elif abs(value) < 1_000_000:  # Less than 1 million
-        return f"{value / 1_000:.1f}K"
-    elif abs(value) < 1_000_000_000:  # Less than 1 billion
-        return f"{value / 1_000_000:.1f}M"
+    elif abs(value) < M_THRESHOLD:  # Less than 1 million
+        return f"{value / K_THRESHOLD:.1f}K"
+    elif abs(value) < B_THRESHOLD:  # Less than 1 billion
+        return f"{value / M_THRESHOLD:.1f}M"
     else:  # 1 billion or more
-        return f"{value / 1_000_000_000:.1f}B"
+        return f"{value / B_THRESHOLD:.1f}B"
+    
 
 if __name__ == '__main__':  # Check if the script is run directly
     app.run(debug=True)  # Start the Flask application in debug mode
