@@ -137,6 +137,7 @@
     </style>
 </head>
 <body>
+    <!-- Text Box with the Title and the Accepted Values-->
     <div class="text_box">
         <h1> Business Profit and Loss Calculator</h1>
 
@@ -153,7 +154,9 @@
 
         </div>
     </div>
+    <!-- The Input Form -->
     <div class="input_field">
+        <!-- Form to collect user input, submitted via POST method -->
         <form method="POST">
             <label for="income">Income:</label>
             <input type="text" name="income" required>
@@ -168,19 +171,20 @@
             <input type="submit" value="Calculate">
         </form>
     </div>
-
+    <!-- The Result Tab on the Right with the Calculated P%L and Graph -->
     <div class="result_container">
         <h1>Financial Statement:</h1>
 
         <div class="result_box">
             <h2>{{ result }}</h2>
         </div>
-
+        <!-- Graphical Representation of Result-->
         <div class="result_graph">
+
+        <!-- If is used to check if there's an image to show -->
         {% if profit_loss_plot %}
-
+        <!-- Using |safe allows and script the image to be rendered correctly, creating an interactive graph. -->
         <div>{{ profit_loss_plot|safe }}</div>
-
         {% endif %}
 
 </body>
